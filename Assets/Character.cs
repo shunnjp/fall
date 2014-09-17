@@ -40,46 +40,7 @@ public class Character : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		/*
-		//Debug.Log (controller.isGrounded);
-		if (controller.isGrounded) {
-			//Debug.Log ("isGrounded == true");
 
-			if(!isGrounded){
-				isGrounded = true;
-				animator.SetTrigger ("landing");
-				Debug.Log ("着地");
-			}
-			velocity = new Vector3 (Input.GetAxis ("Horizontal"), 0.0f, Input.GetAxis ("Vertical"));
-			velocity *= speed;
-
-			transform.LookAt (transform.position + velocity);
-
-			animator.SetFloat ("velocity", velocity.magnitude);
-
-			//Debug.Log (velocity.magnitude);
-
-		} else {
-			//Debug.Log ("isGrounded == false");
-
-			if(isGrounded){
-				isGrounded = false;
-				animator.SetTrigger ("fall");
-				//Debug.Log ("落下");
-			}
-
-			velocity.x = 0;
-			velocity.z = 0;
-
-		}
-		velocity.y -= gravity * Time.deltaTime;
-		controller.Move (velocity * Time.deltaTime);
-			
-		if(gameObject.transform.position.y < -20){
-			gameObject.transform.position = new Vector3(0.0f, 6.0f, 0.0f);
-			velocity.y = 0;
-		}
-		*/
 
 		if(isGrounded){
 			velocity = new Vector3 (Input.GetAxis ("Horizontal"), 0.0f, Input.GetAxis ("Vertical"));
@@ -98,14 +59,7 @@ public class Character : MonoBehaviour {
 			//Debug.Log ("落下");
 			gameObject.rigidbody.velocity = new Vector3(0.0f, gameObject.rigidbody.velocity.y, 0.0f);
 		}
-		/*
-		else if(!isGrounded && gameObject.rigidbody.velocity.y >= 0){
-			animator.SetTrigger ("landing");
-			isGrounded = true;
-			Debug.Log ("着地");
-		}
-		*/
-
+		
 		if(!isGrounded){
 			animator.SetFloat ("velocityY", gameObject.rigidbody.velocity.y);
 		}
@@ -124,7 +78,8 @@ public class Character : MonoBehaviour {
 		if(isGrounded == false && c.gameObject.tag == "Ground"){
 			animator.SetTrigger ("landing");
 			isGrounded = true;
-			//Debug.Log ("着地");
+			gameObject.rigidbody.velocity = Vector3.zero;
+			Debug.Log ("着地");
 		}
 	}
 
