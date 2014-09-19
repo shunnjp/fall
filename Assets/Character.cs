@@ -20,9 +20,9 @@ public class Character : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		
+		//Debug.Log (isGrounded);
 
-
-		Debug.Log (isGrounded);
 		if(isGrounded){
 			velocity = new Vector3 (Input.GetAxis ("Horizontal"), 0.0f, Input.GetAxis ("Vertical"));
 			velocity *= speed;

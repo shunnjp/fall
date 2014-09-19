@@ -8,6 +8,8 @@ public class Jewel : MonoBehaviour {
 	float radius = 0.5f;
 	float speed = 0.2f;
 
+	public GameObject getEffectPrefab;
+
 	// Use this for initialization
 	void Start () {
 		initY = transform.position.y;
@@ -19,5 +21,13 @@ public class Jewel : MonoBehaviour {
 		
 		gameObject.transform.position = new Vector3 (gameObject.transform.position.x, newY, gameObject.transform.position.z);
 		r += speed;
+	}
+
+	void OnTriggerEnter(Collider c){
+		//Debug.Log ("Jewel collided Player");
+		if(c.gameObject.tag == "Player"){
+			Instantiate (getEffectPrefab, gameObject.transform.position, Quaternion.identity);
+			Destroy (gameObject);
+		}
 	}
 }

@@ -16,11 +16,16 @@ public class GameController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		if(Input.GetMouseButtonDown(0)){
+			if(Input.mousePosition.x < Screen.width / 2){
+				iTween.RotateAdd (cameraRig, iTween.Hash ("y", -90, "islocal", true, "time", 1.0f, "easetype", iTween.EaseType.easeInOutCubic));
+			}else{
+				iTween.RotateAdd (cameraRig, iTween.Hash ("y", 90, "islocal", true, "time", 1.0f, "easetype", iTween.EaseType.easeInOutCubic));
+			}
+		}
 	}
 
 	void Init(){
-		Debug.Log ("Init");
 		//GenerateGround();
 		StartCoroutine("GenerateGround");
 	}
@@ -36,17 +41,22 @@ public class GameController : MonoBehaviour {
 			string line = reader.ReadLine();
 			string[] values = line.Split(',');
 			int col = 0;
+			GameObject g;
+			int num;
 			foreach(string i in values){
-				if(int.Parse(i) > 0){
+				num = int.Parse(i);
+				if(num > 0){
+
 					//GameObject.Instantiate (Resources.Load ("Prefabs/Ground"), new Vector3(5 + -1 * col, -1, -5 + 1 * row), Quaternion.Euler (new Vector3(0.0f, 180.0f, 0.0f)));
-					GameObject.Instantiate (Resources.Load ("Prefabs/Ground"), new Vector3(5 + -1 * col, -1, -5 + 1 * row), Quaternion.identity);
+					g = (GameObject)GameObject.Instantiate (Resources.Load ("Prefabs/Ground"), new Vector3(5 + -1 * col, -1, -5 + 1 * row), Quaternion.identity);
+					g.SendMessage ("SetLife", num);
 					yield return new WaitForSeconds(0.02f);
-					switch(int.Parse(i)){
-					case 2:
+					switch(num){
+					case 5:
 						playerPos = new Vector3(5 + -1 * col, 6, -5 + 1 * row);
 						break;
-					case 3:
-						GameObject.Instantiate (jewelPrefab, new Vector3(5 + -1 * col, 1, -5 + 1 * row), Quaternion.identity);
+					case 6:
+						GameObject.Instantiate (jewelPrefab, new Vector3(5 + -1 * col, 1.5f, -5 + 1 * row), Quaternion.identity);
 						break;
 					default:
 						break;
@@ -59,4 +69,6 @@ public class GameController : MonoBehaviour {
 
 		GameObject.Instantiate (playerPrefab, playerPos, Quaternion.identity);
 	}
+
+
 }
