@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Character : MonoBehaviour {
+public class Player : MonoBehaviour {
 
 	Vector3 initPos;
 	Vector3 velocity;
@@ -8,6 +8,8 @@ public class Character : MonoBehaviour {
 	//float gravity = 20.0f;
 	Animator animator;
 	bool isGrounded = true;
+
+	public Vector2 currentPosition;
 
 	// Use this for initialization
 	void Start () {
@@ -63,6 +65,10 @@ public class Character : MonoBehaviour {
 			gameObject.rigidbody.velocity = Vector3.zero;
 			//Debug.Log ("着地");
 		}
+	}
+
+	void SetCurrentPosition(Vector2 pos){
+		currentPosition = pos;
 	}
 
 	/*

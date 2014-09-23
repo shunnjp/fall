@@ -3,12 +3,13 @@ using System.Collections;
 
 public class Ground : MonoBehaviour {
 
-	float r = 0;
-	float radius = 0.15f;
-	float speed = 0.5f;
-
-	int life = 1;
+	public Vector2 position;
+	public int life = 1;
 	private int maxLife = 4;
+
+	private float r = 0;
+	private float radius = 0.15f;
+	private float speed = 0.5f;
 
 	// Use this for initialization
 	void Start () {
@@ -29,6 +30,10 @@ public class Ground : MonoBehaviour {
 				r += 360;
 			}
 		}
+	}
+
+	void SetPos(Vector2 p){
+		position = p;
 	}
 
 	void SetLife(int l){
@@ -53,5 +58,16 @@ public class Ground : MonoBehaviour {
 
 	void DestroySelf(){
 		Destroy (gameObject);
+	}
+
+	/*
+	void OnMouseDown(){
+		Debug.Log ("GroundTop MouseDown");
+	}
+	*/
+
+	void MoveTo(){
+		Debug.Log ("MoveTo");
+		GameObject.FindWithTag ("GameController").SendMessage ("PlayerMove", gameObject);
 	}
 }

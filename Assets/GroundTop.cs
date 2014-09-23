@@ -17,4 +17,9 @@ public class GroundTop : MonoBehaviour {
 		//Debug.Log ("SetTextureOffset");
 		gameObject.renderer.material.SetTextureOffset("_MainTex", offset);
 	}
+
+	void OnMouseDown(){
+		Debug.Log ("GroundTop MouseDown");
+		transform.parent.gameObject.SendMessage ("MoveTo");
+	}
 }
