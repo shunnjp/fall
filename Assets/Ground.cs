@@ -48,6 +48,11 @@ public class Ground : MonoBehaviour {
 		}
 	}
 
+	void AddLife(int value){
+		SetLife(life + value);
+	}
+
+	/*
 	void OnCollisionExit(Collision c){
 		//Debug.Log ("Ground CollisionExit");
 		if(c.gameObject.tag == "Player"){
@@ -55,6 +60,7 @@ public class Ground : MonoBehaviour {
 			SetLife(life - 1);
 		}
 	}
+	*/
 
 	void DestroySelf(){
 		Destroy (gameObject);
@@ -67,7 +73,6 @@ public class Ground : MonoBehaviour {
 	*/
 
 	void MoveTo(){
-		Debug.Log ("MoveTo");
 		GameObject.FindWithTag ("GameController").SendMessage ("PlayerMove", gameObject);
 	}
 }

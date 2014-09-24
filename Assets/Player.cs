@@ -9,7 +9,8 @@ public class Player : MonoBehaviour {
 	Animator animator;
 	bool isGrounded = true;
 
-	public Vector2 currentPosition;
+	public Vector2 initCoordinates;
+	public Vector2 currentCoordinates;
 
 	// Use this for initialization
 	void Start () {
@@ -29,19 +30,21 @@ public class Player : MonoBehaviour {
 			velocity = new Vector3 (Input.GetAxis ("Horizontal"), 0.0f, Input.GetAxis ("Vertical"));
 			velocity *= speed;
 
-			animator.SetFloat ("velocity", velocity.magnitude);
+			//animator.SetFloat ("velocity", velocity.magnitude);
 			gameObject.rigidbody.velocity = new Vector3(velocity.x, gameObject.rigidbody.velocity.y, velocity.z);
 
 			transform.LookAt (transform.position + velocity);
 		}
 
 		//Debug.Log (gameObject.rigidbody.velocity.y);
+		/*
 		if(isGrounded && gameObject.rigidbody.velocity.y < -3){
 			animator.SetTrigger ("fall");
 			isGrounded = false;
 			//Debug.Log ("落下");
 			gameObject.rigidbody.velocity = new Vector3(0.0f, gameObject.rigidbody.velocity.y, 0.0f);
 		}
+		*/
 		
 		if(!isGrounded){
 			animator.SetFloat ("velocityY", gameObject.rigidbody.velocity.y);
@@ -55,6 +58,8 @@ public class Player : MonoBehaviour {
 			//gameObject.rigidbody.MovePosition (new Vector3(0.0f, 6.0f, 0.0f));
 			//velocity.y = 0;
 			gameObject.rigidbody.velocity = Vector3.zero;
+
+			currentCoordinates = initCoordinates;
 		}
 	}
 
@@ -67,8 +72,12 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	void SetCurrentPosition(Vector2 pos){
-		currentPosition = pos;
+	void SetInitCoordinates(Vector2 pos){
+		initCoordinates = pos;
+	}
+
+	void SetCurrentCoordinates(Vector2 pos){
+		currentCoordinates = pos;
 	}
 
 	/*

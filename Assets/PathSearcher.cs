@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 public class PathSearcher {
 
-	private GroundNode startNode;
-	private GroundNode goalNode;
+	public GroundNode startNode;
+	public GroundNode goalNode;
 
 	private GroundNode[,] groundNodeList;
 
@@ -32,34 +32,65 @@ public class PathSearcher {
 		}//for
 	}
 
-	public List<GroundNode> StartSearch(Vector2 startPos, Vector2 goalPos){
+	public bool StartSearch(Vector2 startPos, Vector2 goalPos){
+		Reset();
+
 		startNode = groundNodeList[(int)startPos.x, (int)startPos.y];
 		goalNode = groundNodeList[(int)goalPos.x, (int)goalPos.y];
 
 		goalNode.SetMinimumCost(0);
 
-		//execute seach
-		Search (goalNode);
 
+		List<GroundNode> list = new List<GroundNode>();
+		list.Add (goalNode);
+		while(list.Count > 0){
+			GroundNode tartgetNode = list[0];
+			foreach(GroundNode neighbor in tartgetNode.neighbors){
+				if(!neighbor.ground || (neighbor.ground && neighbor.ground.GetComponent<Ground>().life <= 0)) continue;//GroundのゲームオブジェクトがDestroyされている、またはlife0以下（まだDestroyはされていない）の場合はスキップする
+				if (neighbor.minimumCost == -1
+				    || tartgetNode.minimumCost + 1 < neighbor.minimumCost) {
+					neighbor.SetMinimumCost (tartgetNode.minimumCost + 1, tartgetNode);
+					list.Add (neighbor);
+				}
+			}
+			list.RemoveAt (0);
+
+			//最初にstartNodeに到達した経路が最短なので、今ループでstartNodeのminimumCostが確定したらループを抜ける
+			if(startNode.minimumCost != -1) break;
+		}
+
+		//execute seach
+		//Search (goalNode);
+
+		//startNodeのminimumCostが-1なら到達できていないのでfalseを返す。それ以外はtrueを返す。
+		return (startNode.minimumCost != -1);
+
+		/*
 		//return result
 		List<GroundNode> list = new List<GroundNode> ();
 
 		if (startNode.minimumCost != -1) {
 			GroundNode currentNode = startNode;
-			do {
-				list.Add (currentNode);
+			list.Add (currentNode);
+			while(currentNode.nextNode is GroundNode) {
+				list.Add (currentNode.nextNode);
 				currentNode = currentNode.nextNode;
-			}while(currentNode != goalNode);
+			}
 		}
-
+		
 		return list;
+		*/
+
 	}
 
 	void Search(GroundNode tartgetNode){
+		//targetNodeのneighborsを探索
+		//Debug.Log ("Search!");
 		List<GroundNode> neighbors = tartgetNode.neighbors;
 		for(int i = 0; i<neighbors.Count; i++){
 			GroundNode neighbor = neighbors[i];
-			if (startNode.minimumCost == -1
+			if(!neighbor.ground) continue;//GroundのゲームオブジェクトがDestroyされている場合はスキップする
+			if (neighbor.minimumCost == -1
 			    || tartgetNode.minimumCost + 1 < neighbor.minimumCost) {
 				neighbor.SetMinimumCost (tartgetNode.minimumCost + 1, tartgetNode);
 				Search (neighbor);
@@ -68,8 +99,14 @@ public class PathSearcher {
 	}
 
 	public void Reset(){
+		startNode = null;
+		goalNode = null;
 		//reset all nodes
-
+		foreach(GroundNode i in groundNodeList){
+			if(i != null){
+				i.Reset();
+			}
+		}
 		//set -1 into minimumCost
 	}
 }

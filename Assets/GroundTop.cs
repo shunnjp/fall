@@ -19,7 +19,6 @@ public class GroundTop : MonoBehaviour {
 	}
 
 	void OnMouseDown(){
-		Debug.Log ("GroundTop MouseDown");
 		transform.parent.gameObject.SendMessage ("MoveTo");
 	}
 }

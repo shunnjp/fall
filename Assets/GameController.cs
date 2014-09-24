@@ -10,10 +10,14 @@ public class GameController : MonoBehaviour {
 	public GameObject playerPrefab;
 	public GameObject jewelPrefab;
 
+	public GameObject player;
+
 	public GroundNode[,] groundNodeList;
 
 	private PathSearcher pathSearcher;
 
+	private List<GroundNode> moveList;
+	
 	// Use this for initialization
 	void Start () {
 		//iTween.RotateTo(cameraRig, iTween.Hash ("x", 0, "islocal", true, "time", 1.0f, "delay", 1.0f, "easetype", iTween.EaseType.easeInOutCubic, "oncomplete", "Init", "oncompletetarget", gameObject));
@@ -37,6 +41,9 @@ public class GameController : MonoBehaviour {
 	void Init(){
 		//GenerateGround();
 		StartCoroutine("GenerateGround");
+
+		moveList = new List<GroundNode>();
+
 	}
 
 	IEnumerator GenerateGround(){
@@ -101,46 +108,86 @@ public class GameController : MonoBehaviour {
 
 		}//while
 		
-		//GameObject.Instantiate (playerPrefab, playerPos, Quaternion.identity);
-		GameObject player = (GameObject)GameObject.Instantiate (playerPrefab, new Vector3(5 + -1 * playerPos.x, 6, -5 + 1 * playerPos.y), Quaternion.identity);
-		player.SendMessage ("SetCurrentPosition", playerPos);
+		player = (GameObject)GameObject.Instantiate (playerPrefab, new Vector3(5 + -1 * playerPos.x, 6, -5 + 1 * playerPos.y), Quaternion.identity);
+		player.SendMessage ("SetInitCoordinates", playerPos);
+		player.SendMessage ("SetCurrentCoordinates", playerPos);
 		
 		//set neighbor int ground nodes for search path
 		pathSearcher.init ();
-		/*
-		int j,k;
-		for(j = 0; j < groundNodeList.GetLength (0); j++){
-			for(k = 0; k < groundNodeList.GetLength (1); k++){
-				//Debug.Log ("(" + j + "," + k + ") " + groundNodeList[j,k]);
-				if(groundNodeList[j,k] == null) continue;
-				GroundNode currentNode = groundNodeList[j,k];
-				if(j > 0 && groundNodeList[j-1,k] != null) currentNode.AddNeighbor(groundNodeList[j-1,k]);
-				if(j < groundNodeList.GetLength (0)-1 && groundNodeList[j+1,k] != null) currentNode.AddNeighbor(groundNodeList[j+1,k]);
-				if(k > 0 && groundNodeList[j,k-1] != null) currentNode.AddNeighbor(groundNodeList[j,k-1]);
-				if(k < groundNodeList.GetLength (1)-1 && groundNodeList[j,k+1] != null) currentNode.AddNeighbor(groundNodeList[j,k+1]);
-			}
-		}//for
-		*/
 	}
 
 	void PlayerMove(GameObject g){
 		Ground ground = g.GetComponent<Ground> ();
-		Debug.Log (ground);
 		Vector2 groundPos = ground.position;
 
-		Player player = GameObject.FindWithTag ("Player").GetComponent<Player>();
-		Vector2 playerPos = player.currentPosition;
-		List<GroundNode> list = pathSearcher.StartSearch (playerPos, groundPos);
-		if (list.Count == 0) {
-			Debug.Log ("can't reach there");
-		} else {
-			Debug.Log ("===== PathSearcher Result =====");
-			foreach(GroundNode i in list){
-				Debug.Log (i.xIndex + "," + i.yIndex);
+		Player playerComp = GameObject.FindWithTag ("Player").GetComponent<Player>();
+		Vector2 playerPos = playerComp.currentCoordinates;
+		//Debug.Log ("playerPos : " + playerPos.x + "," + playerPos.y);
+
+		//探索開始
+		bool result = pathSearcher.StartSearch (playerPos, groundPos);
+
+		if (result == true) {
+			moveList.Clear ();
+
+			//Debug.Log ("===== PathSearcher Result =====");
+			GroundNode currentNode = pathSearcher.startNode;
+			moveList.Add (currentNode);
+			//Debug.Log ("(" + currentNode.xIndex + "," + currentNode.yIndex + ") next(" + currentNode.nextNode + ")");
+			while(currentNode.nextNode is GroundNode){
+				currentNode = currentNode.nextNode;
+				moveList.Add (currentNode);
+				//Debug.Log ("(" + currentNode.xIndex + "," + currentNode.yIndex + ") next(" + currentNode.nextNode + ")");
 			}
-			Debug.Log ("===== /PathSearcher Result =====");
+			//GameObject.FindWithTag ("Player").GetComponent<Animator>().SetFloat ("velocity", 3.0f);
+			ExecMoveQueue();
+			//Debug.Log ("===== /PathSearcher Result =====");
+		}else{
+			Debug.Log ("can't reach there");
 		}
 	}
 
+	void ExecMoveQueue(){
+
+		GroundNode groundNode = moveList[0];
+
+
+		if(groundNode.index == player.GetComponent<Player>().currentCoordinates){
+			//Debug.Log ("座標が一緒なので移動はスキップ");
+			CompleteMove();
+		}else{
+			player.GetComponent<Animator>().SetFloat ("velocity", 3.0f);
+			iTween.MoveTo(player, iTween.Hash (
+				"x", groundNode.ground.transform.position.x,
+				"z", groundNode.ground.transform.position.z,
+				"time", 0.3f,
+				"delay", 0.0f,
+				"easetype", iTween.EaseType.linear,
+				"oncompletetarget", gameObject,
+				"oncomplete", "CompleteMove"
+			));
+
+			player.transform.LookAt (new Vector3(groundNode.ground.transform.position.x, player.transform.position.y, groundNode.ground.transform.position.z));
+			
+			}
+	}
+
+	void CompleteMove(){
+		GroundNode previousNode = moveList[0];
+		moveList.RemoveAt (0);
+
+		player.SendMessage ("SetCurrentCoordinates", new Vector2(previousNode.xIndex, previousNode.yIndex));//playerのcurrentCoordinateに異動先の座標をセット
+
+		//Debug.Log ("complete : " + groundNode.xIndex + "," + groundNode.yIndex);
+		if(moveList.Count > 0){
+			//lifeはそのマスを離れるときに減らすため、最後のひとつの場合はlifeを減らさない。つまり最後の一つでない場合は減らす。
+			previousNode.ground.SendMessage ("AddLife", -1);
+			//次のキューへ
+			ExecMoveQueue();
+		}else{
+			player.GetComponent<Animator>().SetFloat ("velocity", 0.0f);
+			//Debug.Log ("移動完了");
+		}
+	}
 
 }
