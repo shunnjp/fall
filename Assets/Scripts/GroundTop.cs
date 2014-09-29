@@ -19,6 +19,8 @@ public class GroundTop : MonoBehaviour {
 	}
 
 	void OnMouseDown(){
-		transform.parent.gameObject.SendMessage ("MoveTo");
+		if (!Input.GetKey (KeyCode.Space)) {
+			transform.parent.gameObject.SendMessage ("MoveTo");
+		}
 	}
 }

@@ -17,7 +17,10 @@ public class GameController : MonoBehaviour {
 	private PathSearcher pathSearcher;
 
 	private List<GroundNode> moveList;
-	
+
+	private bool cameraRotation = false;
+	private Vector3 previousMousePosition;
+
 	// Use this for initialization
 	void Start () {
 		//iTween.RotateTo(cameraRig, iTween.Hash ("x", 0, "islocal", true, "time", 1.0f, "delay", 1.0f, "easetype", iTween.EaseType.easeInOutCubic, "oncomplete", "Init", "oncompletetarget", gameObject));
@@ -36,6 +39,18 @@ public class GameController : MonoBehaviour {
 			}
 		}
 		*/
+		if (Input.GetKey (KeyCode.Space) && Input.GetMouseButtonDown(0)) {
+			//Debug.Log ("start camera rotation");
+			cameraRotation = true;
+			previousMousePosition = Input.mousePosition;
+		}else if(cameraRotation){
+			cameraRig.transform.Rotate (new Vector3(0.0f, previousMousePosition.x - Input.mousePosition.x, 0.0f));
+			previousMousePosition = Input.mousePosition;
+			if(Input.GetMouseButtonUp(0)){
+				//Debug.Log ("end camera rotation");
+				cameraRotation = false;
+			}
+		}
 	}
 
 	void Init(){
@@ -188,6 +203,11 @@ public class GameController : MonoBehaviour {
 			player.GetComponent<Animator>().SetFloat ("velocity", 0.0f);
 			//Debug.Log ("移動完了");
 		}
+	}
+
+	void OnGUI(){
+		GUI.Label (new Rect (5, Screen.height - 30, Screen.width - 10, 20), "- click the block to move the character there");
+		GUI.Label (new Rect (5, Screen.height - 20, Screen.width - 10, 20), "- drag the mouse while holding down the space key to rotate camera");
 	}
 
 }

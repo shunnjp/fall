@@ -8,9 +8,9 @@ public class Ground : MonoBehaviour {
 	private int maxLife = 4;
 
 	private float r = 0;
-	private float radius = 0.15f;
+	private float radius = 0.1f;
 	private float speed = 0.5f;
-
+	
 	// Use this for initialization
 	void Start () {
 		r = Random.Range (0, 360);
@@ -52,25 +52,9 @@ public class Ground : MonoBehaviour {
 		SetLife(life + value);
 	}
 
-	/*
-	void OnCollisionExit(Collision c){
-		//Debug.Log ("Ground CollisionExit");
-		if(c.gameObject.tag == "Player"){
-			//Debug.Log ("Ground CollisionExit with Player");
-			SetLife(life - 1);
-		}
-	}
-	*/
-
 	void DestroySelf(){
 		Destroy (gameObject);
 	}
-
-	/*
-	void OnMouseDown(){
-		Debug.Log ("GroundTop MouseDown");
-	}
-	*/
 
 	void MoveTo(){
 		GameObject.FindWithTag ("GameController").SendMessage ("PlayerMove", gameObject);
